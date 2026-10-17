@@ -1,0 +1,12 @@
+'use strict';
+const router = require('express').Router();
+const { body } = require('express-validator');
+const c = require('../controllers/authController');
+const { asyncRoute } = require('../middlewares/errors');
+const { validateRequest } = require('../middlewares/validate');
+const { requireAuth } = require('../middlewares/auth');
+router.get('/',c.home);
+router.get('/login',c.loginForm);
+router.post('/login', [body('correo').isEmail().withMessage('Ingresa un correo válido.'), body('password').isString().notEmpty().withMessage('La contraseña es obligatoria.')], validateRequest, asyncRoute(c.login));
+router.post('/logout', requireAuth, c.logout);
+module.exports=router;

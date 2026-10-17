@@ -1,0 +1,28 @@
+<%- include('../partials/header',{title}) %>
+<section class="page-head hero-head"><div><div class="eyebrow">RESUMEN GENERAL <span class="eyebrow-divider"></span> 2026</div><h1>Panel de administración <span class="title-wave">✦</span></h1><p>Organiza estudiantes, docentes y procesos académicos desde un solo lugar.</p></div><a class="btn primary" href="/admin/estudiantes/nuevo"><svg class="icon"><use href="/img/icons.svg#plus"></use></svg> Nuevo estudiante</a></section>
+<section class="stats" aria-label="Estadísticas académicas">
+ <a href="/admin/estudiantes" class="stat-card"><span class="stat-icon stat-blue"><svg class="icon"><use href="/img/icons.svg#users"></use></svg></span><span class="stat-label">Estudiantes registrados</span><span class="stat-value"><%= stats.estudiantes %></span><span class="stat-trend"><svg class="icon"><use href="/img/icons.svg#arrow-right"></use></svg> Ver expedientes</span></a>
+ <a href="/admin/docentes" class="stat-card"><span class="stat-icon stat-purple"><svg class="icon"><use href="/img/icons.svg#user"></use></svg></span><span class="stat-label">Docentes registrados</span><span class="stat-value"><%= stats.docentes %></span><span class="stat-trend"><svg class="icon"><use href="/img/icons.svg#arrow-right"></use></svg> Gestionar docentes</span></a>
+ <a href="/admin/secciones" class="stat-card"><span class="stat-icon stat-orange"><svg class="icon"><use href="/img/icons.svg#layers"></use></svg></span><span class="stat-label">Secciones</span><span class="stat-value"><%= stats.secciones %></span><span class="stat-trend"><svg class="icon"><use href="/img/icons.svg#arrow-right"></use></svg> Ver grupos</span></a>
+ <a href="/admin/ciclos" class="stat-card"><span class="stat-icon stat-green"><svg class="icon"><use href="/img/icons.svg#calendar"></use></svg></span><span class="stat-label">Ciclos activos</span><span class="stat-value"><%= stats.ciclos %></span><span class="stat-trend"><svg class="icon"><use href="/img/icons.svg#arrow-right"></use></svg> Configurar ciclos</span></a>
+</section>
+<section class="dashboard-grid">
+<div class="card control-card"><div class="section-heading"><div><h2>Gestión académica</h2><p>Accesos directos a los módulos principales</p></div><span class="subtle-badge"><svg class="icon"><use href="/img/icons.svg#dashboard"></use></svg> <%= menu.length %> módulos</span></div>
+ <div class="module-grid">
+ <% const mapping={estudiantes:'users',docentes:'user',ciclos:'calendar',asignaturas:'book',secciones:'layers',periodos:'clipboard',asignaciones:'folder',matriculas:'id'}; %>
+ <% menu.forEach(([slug,label],index)=>{ %><a class="module-tile" href="/admin/<%= slug %>"><span class="module-symbol m<%= index%4 %>"><svg class="icon"><use href="/img/icons.svg#<%= mapping[slug] %>"></use></svg></span><span><b><%= label %></b><small>Administrar registros</small></span><svg class="icon module-arrow"><use href="/img/icons.svg#arrow-right"></use></svg></a><% }) %>
+ </div>
+</div>
+<div class="dashboard-aside"><div class="card summary-card"><div class="section-heading"><div><h2>Estado del sistema</h2><p>Resumen de información</p></div></div>
+ <div class="system-row"><span class="system-icon"><svg class="icon"><use href="/img/icons.svg#database"></use></svg></span><div><b>Base de datos MySQL</b><small>Conexión establecida</small></div><span class="status-indicator"></span></div>
+ <div class="system-row"><span class="system-icon"><svg class="icon"><use href="/img/icons.svg#shield"></use></svg></span><div><b>Acceso protegido</b><small>Sesiones y roles activos</small></div><span class="status-indicator"></span></div>
+ <div class="summary-numbers"><div><b><%= stats.asignaturas %></b><span>Asignaturas</span></div><div><b><%= stats.matriculas %></b><span>Matrículas activas</span></div></div></div>
+ <div class="help-card"><div class="help-spark"><svg class="icon"><use href="/img/icons.svg#spark"></use></svg></div><h3>Todo bajo control</h3><p>Las acciones quedan guardadas en MySQL y se validan según el rol de cada usuario.</p><a href="/admin/asignaciones">Ver asignaciones <svg class="icon"><use href="/img/icons.svg#arrow-right"></use></svg></a></div></div>
+</section>
+<section class="card recent-card"><div class="section-heading"><div><h2>Estudiantes recientes</h2><p>Últimos expedientes registrados</p></div><a class="text-link" href="/admin/estudiantes">Ver todos <svg class="icon"><use href="/img/icons.svg#arrow-right"></use></svg></a></div>
+ <div class="table-scroll"><table><thead><tr><th>Estudiante</th><th>Carnet</th><th>Estado</th><th></th></tr></thead><tbody>
+ <% if(!recientes.length){ %><tr><td colspan="4" class="empty-cell">Aún no hay estudiantes registrados.</td></tr><% } %>
+ <% recientes.forEach((e,index)=>{ %><tr><td><span class="table-person"><span class="person-avatar"><%= e.nombre.substring(0,1) %></span><b><%= e.nombre %></b></span></td><td class="mono"><%= e.carnet %></td><td><span class="status-pill <%= e.activo?'status-active':'status-off' %>"><%= e.activo?'Activo':'Inactivo' %></span></td><td class="align-right"><a class="table-link" href="/admin/estudiantes">Ver listado →</a></td></tr><% }) %>
+ </tbody></table></div>
+</section>
+<%- include('../partials/footer') %>

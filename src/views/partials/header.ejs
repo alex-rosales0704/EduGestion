@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101e38">
+<title><%= title %> · EduGestion Web</title>
+<link rel="stylesheet" href="/css/style.css">
+</head><body class="<%= usuario ? 'app-layout' : 'guest-layout' %>
+<% const admins=[['dashboard','/admin','Panel principal'],['users','/admin/estudiantes','Estudiantes'],['user','/admin/docentes','Docentes'],['calendar','/admin/ciclos','Ciclos lectivos'],['book','/admin/asignaturas','Asignaturas'],['layers','/admin/secciones','Secciones'],['clipboard','/admin/periodos','Periodos'],['folder','/admin/asignaciones','Asignaciones'],['id','/admin/matriculas','Matrículas']]; %>
+<% const docentes=[['dashboard','/docente','Mi panel'],['clipboard','/docente/asignaciones','Mis asignaciones']]; %>
+<% const estudiantes=[['dashboard','/estudiante','Mi panel'],['chart','/estudiante/calificaciones','Calificaciones'],['book','/estudiante/historial','Historial académico'],['download','/estudiante/boleta','Descargar boleta']]; %>
+<% const rolTexto={ADMINISTRADOR:'Administrador',DOCENTE:'Docente',ESTUDIANTE:'Estudiante'}; %>
+<% if(usuario) { %>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+  <div class="sidebar-brand"><span class="logo-mark"><svg class="icon icon-lg"><use href="/img/icons.svg#school"></use></svg></span><span><strong>EduGestion</strong><small>WEB <span class="brand-dot">•</span> CAMPUS</small></span></div>
+  <div class="sidebar-divider"></div>
+  <div class="side-caption">ESPACIO DE TRABAJO</div>
+  <nav class="side-nav">
+  <% const navItems = usuario.rol==='ADMINISTRADOR'?admins:usuario.rol==='DOCENTE'?docentes:estudiantes; %>
+  <% navItems.forEach(([ico,href,label])=>{ const active=href==='/admin'||href==='/docente'||href==='/estudiante'?requestPath===href:requestPath===href||requestPath.startsWith(href+'/'); %>
+  <a class="side-link <%= active?'active':'' %>" href="<%= href %>"><svg class="icon"><use href="/img/icons.svg#<%= ico %>"></use></svg><span><%= label %></span><% if(active){ %><span class="nav-active-dot"></span><% } %></a>
+  <% }) %>
+  </nav>
+  <div class="side-caption side-caption-second">CUENTA</div>
+  <nav class="side-nav"><a class="side-link <%= requestPath==='/perfil'?'active':'' %>" href="/perfil"><svg class="icon"><use href="/img/icons.svg#settings"></use></svg>Mi perfil</a></nav>
+  <div class="sidebar-bottom"><div class="support-panel"><svg class="icon"><use href="/img/icons.svg#shield"></use></svg><div><b>Entorno académico</b><span>Datos protegidos por rol</span></div></div><div class="sidebar-credit">UDB · DWS901 · SPRINT II</div></div>
+</aside>
+<div class="app-main">
+<header class="topbar">
+  <div class="top-left"><button class="icon-button mobile-menu" id="toggleSidebar" type="button" aria-label="Abrir menú"><svg class="icon"><use href="/img/icons.svg#menu"></use></svg></button>
+    <div class="breadcrumbs"><span>EduGestion Web</span><span class="crumb-sep">/</span><b><%= title %></b></div></div>
+  <div class="top-right"><span class="connection"><span></span>Sistema activo</span><a href="/perfil" class="top-account" title="Mi perfil"><span class="avatar"><%= usuario.correo.substring(0,1).toUpperCase() %></span><span class="account-data"><b><%= rolTexto[usuario.rol]||usuario.rol %></b><small><%= usuario.correo %></small></span></a>
+  <form action="/logout" method="post"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="icon-button logout-button" type="submit" title="Cerrar sesión" aria-label="Cerrar sesión"><svg class="icon"><use href="/img/icons.svg#logout"></use></svg></button></form></div>
+</header>
+<main class="container" id="contenido">
+<% if(mensaje){ %><div class="flash" role="status"><svg class="icon"><use href="/img/icons.svg#check"></use></svg><%= mensaje %><button type="button" class="flash-close" data-dismiss-alert aria-label="Cerrar aviso">×</button></div><% } %>
+<% } else { %><main class="auth-screen"><% } %>

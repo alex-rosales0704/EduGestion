@@ -1,0 +1,14 @@
+'use strict';
+const router=require('express').Router();
+const {requireRole}=require('../middlewares/auth');
+const {asyncRoute}=require('../middlewares/errors');
+const c=require('../controllers/adminController');
+router.use(requireRole('ADMINISTRADOR'));
+router.get('/',asyncRoute(c.dashboard));
+router.get('/:type',asyncRoute(c.list));
+router.get('/:type/nuevo',asyncRoute(c.form));
+router.get('/:type/:id/editar',asyncRoute(c.form));
+router.post('/:type',asyncRoute(c.save));
+router.post('/:type/:id',asyncRoute(c.save));
+router.post('/:type/:id/:kind',asyncRoute(c.status));
+module.exports=router;
