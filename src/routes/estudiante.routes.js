@@ -6,4 +6,5 @@ r.get('/',asyncRoute(c.inicio));
 r.get('/calificaciones',asyncRoute(c.inicio));
 r.get('/historial',asyncRoute(c.inicio));
 r.get('/boleta',asyncRoute(c.boleta));
+r.get('/documentos',asyncRoute(require('../controllers/documentController').student));
 module.exports=r;

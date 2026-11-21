@@ -41,6 +41,20 @@ async function form(req,res){
  const item=id?await repo.one(type,id):{},options=await repo.options();
  res.render('admin/form',{title:id?'Editar '+d.title:'Nuevo - '+d.title,type,d,item,options,id,menu});
 }
+async function detail(req,res){
+ const {type}=req.params,id=Number(req.params.id);
+ if(!Number.isSafeInteger(id)||id<1)throw new AppError(422,'Identificador inválido.');
+ let item,fields,title;
+ if(isUser(type)){
+   const d=users.def(type);const [[row]=[]]=await pool.execute(`SELECT t.*,u.correo,u.activo FROM ${d.table} t JOIN usuarios u ON u.id=t.usuario_id WHERE t.id=?`,[id]);
+   if(!row)throw new AppError(404,'Expediente no encontrado.');
+   item=row;fields=[['correo','Correo institucional'],[d.code,'Código'],['nombres','Nombres'],['apellidos','Apellidos'],...d.fields.map(f=>[f,f.replaceAll('_',' ')])];
+   title=type==='estudiantes'?'Detalle del estudiante':'Detalle del docente';
+ }else{
+   const d=repo.definition(type);item=await repo.one(type,id);fields=d.fields.map(f=>[f.name,f.label]);title='Detalle - '+d.title;
+ }
+ res.render('admin/detalle',{title,type,item,fields,id});
+}
 async function save(req,res){
  const type=req.params.type,id=req.params.id?Number(req.params.id):null;
  if(id!==null && (!Number.isSafeInteger(id)||id<1))throw new AppError(422,'Identificador inválido.');
@@ -58,4 +72,4 @@ async function status(req,res){
  }else await catalog.changeStatus(type,id,kind);
  flash(req,'Estado actualizado correctamente.');res.redirect(`/admin/${type}`);
 }
-module.exports={dashboard,list,form,save,status};
+module.exports={dashboard,list,form,detail,save,status};

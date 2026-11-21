@@ -1,4 +1,4 @@
--- EduGestion Web | Sprint II | MySQL 8.0.16+
+-- EduGestion Web | Sprint III | MySQL 8.0.16+
 -- Creado automaticamente por npm run setup / npm run db:init. No requiere Workbench.
 CREATE DATABASE IF NOT EXISTS edugestion_web CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE edugestion_web;
@@ -129,6 +129,22 @@ CREATE TABLE IF NOT EXISTS calificaciones (
  CONSTRAINT fk_calif_matricula FOREIGN KEY (matricula_id) REFERENCES matriculas(id),
  CONSTRAINT fk_calif_asignacion FOREIGN KEY (asignacion_id) REFERENCES asignaciones_docentes(id),
  CONSTRAINT fk_calif_periodo FOREIGN KEY (periodo_id) REFERENCES periodos_evaluacion(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS documentos (
+ id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+ estudiante_id INT UNSIGNED NOT NULL,
+ usuario_id INT UNSIGNED NOT NULL,
+ nombre_original VARCHAR(180) NOT NULL,
+ nombre_almacenado VARCHAR(80) NOT NULL UNIQUE,
+ tipo_mime VARCHAR(60) NOT NULL,
+ tamano_bytes INT UNSIGNED NOT NULL,
+ descripcion VARCHAR(200) NOT NULL,
+ creado_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ eliminado_at DATETIME NULL,
+ KEY ix_documentos_estudiante (estudiante_id),
+ CONSTRAINT fk_documentos_estudiante FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id),
+ CONSTRAINT fk_documentos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB;
 
 INSERT IGNORE INTO roles(id,nombre) VALUES (1,'ADMINISTRADOR'),(2,'DOCENTE'),(3,'ESTUDIANTE');

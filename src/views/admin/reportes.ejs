@@ -1,0 +1,17 @@
+<%- include('../partials/header',{title}) %>
+<% const filter='?ciclo='+ciclo; const maxSeccion=Math.max(1,...secciones.map(s=>Number(s.matriculas)));const maxAsignatura=10;const totalNotas=distribucion.aprobatorias+distribucion.menores; %>
+<section class="page-head"><div><div class="eyebrow">SPRINT III <span class="eyebrow-divider"></span> ANALÍTICA ACADÉMICA</div><h1>Reportes y estadísticas</h1><p>Indicadores y gráficos calculados en tiempo real a partir de los registros de MySQL.</p></div><div class="sprint-links"><a class="btn primary" href="/admin/reportes/pdf<%= filter %>">Exportar PDF</a><a class="btn outline" href="/admin/reportes/xlsx<%= filter %>">Exportar Excel</a></div></section>
+<form class="report-filter card" action="/admin/reportes" method="get"><label for="ciclo">Filtrar por ciclo lectivo</label><select id="ciclo" name="ciclo"><option value="0">Todos los ciclos</option><% ciclos.forEach(c=>{ %><option value="<%= c.id %>" <%= ciclo===c.id?'selected':'' %>><%= c.nombre %></option><% }) %></select><button type="submit" class="btn primary">Aplicar filtro</button></form>
+<div class="report-stat-grid">
+<% [['Estudiantes activos',stats.estudiantes],['Docentes activos',stats.docentes],['Matrículas activas',stats.matriculas],['Secciones activas',stats.secciones],['Calificaciones',stats.notas],['Promedio de notas',stats.promedio===null?'Sin datos':Number(stats.promedio).toFixed(2)]].forEach(([label,value])=>{ %><div class="report-stat"><small><%= label %></small><strong><%= value %></strong></div><% }) %>
+</div>
+<div class="report-chart-grid"><section class="card report-panel"><div class="section-heading"><div><h2>Matrículas por sección</h2><p>Cantidad de matrículas activas</p></div></div><div class="bar-chart">
+<% if(!secciones.length){ %><p class="muted">No hay secciones para el ciclo seleccionado.</p><% } %>
+<% secciones.forEach(s=>{ %><div class="bar-row"><span class="bar-label"><%= s.nombre %></span><div class="bar-track"><div class="bar-fill" style="width:<%= Math.min(100,Number(s.matriculas)*100/maxSeccion) %>%"></div></div><strong><%= s.matriculas %></strong></div><% }) %>
+</div></section>
+<section class="card report-panel"><div class="section-heading"><div><h2>Promedios por asignatura</h2><p>Media de calificaciones registradas (0 a 10)</p></div></div><div class="bar-chart">
+<% if(!asignaturas.length){ %><p class="muted">Aún no hay asignaturas asignadas.</p><% } %>
+<% asignaturas.forEach(a=>{ %><div class="bar-row"><span class="bar-label"><%= a.nombre %></span><div class="bar-track"><div class="bar-fill bar-teal" style="width:<%= a.promedio===null?0:Math.min(100,Number(a.promedio)*100/maxAsignatura) %>%"></div></div><strong><%= a.promedio===null?'—':Number(a.promedio).toFixed(2) %></strong></div><% }) %>
+</div></section></div>
+<section class="card report-panel"><div class="section-heading"><div><h2>Distribución de notas</h2><p>Notas individuales registradas, no aprobación final de asignatura</p></div></div><div class="distribution"><div><b><%= distribucion.aprobatorias %></b><span>Notas de 6.00 a 10.00</span></div><div><b><%= distribucion.menores %></b><span>Notas menores a 6.00</span></div><div class="distribution-track"><span style="width:<%= totalNotas?distribucion.aprobatorias*100/totalNotas:0 %>%"></span></div></div></section>
+<%- include('../partials/footer') %>

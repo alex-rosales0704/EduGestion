@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {"label":"1. Instalar dependencias", "type":"shell", "command":"npm install", "group":"build", "problemMatcher":[]},
+    {"label":"2. Configurar MySQL automáticamente", "type":"shell", "command":"npm run setup", "problemMatcher":[]},
+    {"label":"3. Iniciar EduGestion", "type":"shell", "command":"npm start", "group":"test", "problemMatcher":[]},
+    {"label":"Verificar la base MySQL", "type":"shell", "command":"npm run db:verify", "problemMatcher":[]}
+  ]
+}

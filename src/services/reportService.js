@@ -44,3 +44,30 @@ function boletaEstudiante(res,datos){
   doc.end();
 }
 module.exports={boletaEstudiante};
+
+function reporteAcademicoPDF(res,data){
+ const doc=new PDFDocument({size:'A4',margin:45,info:{Title:'Reporte académico EduGestion Web'}});
+ res.type('application/pdf');res.attachment(`edugestion_reporte_${data.ciclo||'general'}.pdf`);
+ doc.pipe(res);
+ const navy='#17315c',gray='#51627b';
+ doc.rect(0,0,595,112).fill(navy);
+ doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(21).text('EduGestion Web',45,33);
+ doc.font('Helvetica').fontSize(11).text('REPORTE ACADÉMICO - SPRINT III',45,67);
+ let y=137;
+ const heading=(title)=>{if(y>720){doc.addPage();y=45;}doc.font('Helvetica-Bold').fontSize(13).fillColor(navy).text(title,45,y);y+=26;};
+ const row=(left,right)=>{if(y>745){doc.addPage();y=45;}doc.font('Helvetica').fontSize(10).fillColor(gray).text(String(left),48,y,{width:380});doc.font('Helvetica-Bold').fillColor(navy).text(String(right??'-'),445,y,{width:100,align:'right'});y+=23;};
+ const periodo=data.ciclo?data.ciclos.find(c=>c.id===data.ciclo)?.nombre:'Todos los ciclos';
+ doc.fillColor(gray).fontSize(10).text('Ciclo: '+periodo,45,y);y+=32;
+ heading('Indicadores generales');
+ for(const [label,key] of [['Estudiantes activos','estudiantes'],['Docentes activos','docentes'],['Matrículas activas','matriculas'],['Secciones activas','secciones'],['Notas registradas','notas'],['Promedio de notas','promedio']])row(label,data.stats[key]??'Sin datos');
+ y+=12;heading('Matrículas por sección');
+ for(const s of data.secciones)row(s.nombre,s.matriculas);
+ y+=12;heading('Rendimiento por asignatura');
+ for(const a of data.asignaturas)row(`${a.nombre} (${a.calificaciones} notas)`,a.promedio??'Sin notas');
+ y+=12;heading('Distribución de calificaciones');
+ row('Notas de 6.00 a 10.00',data.distribucion.aprobatorias);
+ row('Notas menores de 6.00',data.distribucion.menores);
+ doc.font('Helvetica').fontSize(8).fillColor(gray).text('Estadísticas basadas en las calificaciones individuales registradas. No representan aprobación final por asignatura.',45,775,{width:500});
+ doc.end();
+}
+module.exports.reporteAcademicoPDF=reporteAcademicoPDF;

@@ -1,0 +1,6 @@
+<%- include('../partials/header',{title}) %>
+<section class="page-head"><div><a class="back-link" href="/admin/<%= type %>">← Regresar al listado</a><h1><%= title %> <span class="title-wave">#<%= id %></span></h1><p>Información detallada del registro, consultada directamente desde MySQL.</p></div><a class="btn outline" href="/admin/<%= type %>">Ver todos</a></section>
+<section class="card info-card"><div class="section-heading"><div><h2>Ficha académica</h2><p>ID del registro: <%= id %></p></div></div><div class="detail-grid">
+<% fields.forEach(([key,label])=>{ %><div class="detail-item"><span><%= label %></span><b><%= item[key] ?? 'No registrado' %></b></div><% }) %>
+</div></section>
+<%- include('../partials/footer') %>

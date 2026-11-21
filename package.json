@@ -1,8 +1,8 @@
 {
   "name": "edugestion-web",
-  "version": "2.1.0",
+  "version": "3.0.0-rc.2",
   "private": true,
-  "description": "EduGestion Web | Sprint II - Full Stack académico",
+  "description": "EduGestion Web | Sprint III - Integración Full Stack y Release Candidate",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

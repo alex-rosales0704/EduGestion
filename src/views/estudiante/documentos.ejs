@@ -1,0 +1,7 @@
+<%- include('../partials/header',{title}) %>
+<section class="page-head"><div><div class="eyebrow">PORTAL ESTUDIANTIL / ARCHIVOS</div><h1>Mis documentos</h1><p>Consulta y descarga únicamente los archivos asociados a tu expediente.</p></div></section>
+<section class="card data-card"><div class="data-toolbar"><div><h2>Documentación disponible</h2><span><%= documentos.length %> documentos</span></div></div><div class="table-scroll"><table><thead><tr><th>Archivo</th><th>Descripción</th><th>Fecha</th><th>Descarga</th></tr></thead><tbody>
+<% if(!documentos.length){ %><tr><td class="empty-cell" colspan="4">Aún no tienes archivos adjuntos.</td></tr><% } %>
+<% documentos.forEach(d=>{ %><tr><td><%= d.nombre_original %></td><td><%= d.descripcion %></td><td><%= new Date(d.creado_at).toLocaleDateString('es-SV') %></td><td><a class="btn small outline" target="_blank" rel="noopener" href="/documentos/<%= d.id %>/ver">Ver archivo</a><a class="btn small outline" href="/documentos/<%= d.id %>/descargar">Descargar</a></td></tr><% }) %>
+</tbody></table></div></section>
+<%- include('../partials/footer') %>

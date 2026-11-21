@@ -2,7 +2,7 @@
 const {pool,transaction}=require('../config/db');
 const {AppError}=require('../middlewares/errors');
 const {cicloAbierto}=require('./rules');
-const {notaValida}=require('./gradeService');
+const {parseNotaEntries}=require('./notaInputService');
 async function assignedTo(docenteUsuarioId,asignacionId,conn=pool){
  const [[row]=[]]=await conn.execute(`SELECT a.*,s.nombre AS seccion_nombre,m.nombre AS asignatura_nombre,c.nombre AS ciclo_nombre
    FROM asignaciones_docentes a JOIN docentes d ON d.id=a.docente_id JOIN secciones s ON s.id=a.seccion_id
@@ -29,15 +29,13 @@ async function cuadroNotas(userId,id){
  return {asignacion,periodos,alumnos,mapa,cicloCerrado:ciclo.estado==='CERRADO'};
 }
 async function guardar(userId,asignacionId,periodoId,notas){
- if(typeof notas!=='object'||!notas||Array.isArray(notas))throw new AppError(422,'Formulario de calificaciones inválido.');
+ const entradas = parseNotaEntries(notas);
  return transaction(async conn=>{
    const a=await assignedTo(userId,asignacionId,conn);
    await cicloAbierto(a.ciclo_id,conn);
    const [[periodo]=[]]=await conn.execute('SELECT id,estado FROM periodos_evaluacion WHERE id=? AND ciclo_id=? FOR UPDATE',[periodoId,a.ciclo_id]);
    if(!periodo||periodo.estado!=='ABIERTO')throw new AppError(409,'El periodo no existe o se encuentra cerrado.');
-   for(const [matriculaId,nota] of Object.entries(notas)) {
-     if(nota==='')continue;
-     if(!/^[1-9]\d*$/.test(matriculaId)||!notaValida(nota))throw new AppError(422,'Hay una calificación inválida (rango permitido: 0.00 a 10.00).');
+   for(const {matriculaId, nota} of entradas) {
      const [[m]=[]]=await conn.execute('SELECT id FROM matriculas WHERE id=? AND ciclo_id=? AND seccion_id=? AND estado=?',[matriculaId,a.ciclo_id,a.seccion_id,'ACTIVA']);
      if(!m)throw new AppError(403,'La matrícula no pertenece a la sección autorizada.');
      await conn.execute(`INSERT INTO calificaciones(matricula_id,asignacion_id,periodo_id,nota) VALUES (?,?,?,?)
